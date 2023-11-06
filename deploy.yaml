@@ -16,24 +16,21 @@ spec:
       containers:
       - name: github-deploy
         image: wardviaene/github-deploy
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         ports:
-        - containerPort: 8080
+        - name: http-port
+          containerPort: 8080
         env:
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
                 name: github-deploy
-                key: github-deploy
+                key: github-token
                 optional: false
           - name: WEBHOOK_SECRET
             valueFrom:
               secretKeyRef:
                 name: github-deploy
-                key: github-deploy
+                key: webhook-secret
                 optional: false
 ---
 apiVersion: v1
@@ -41,11 +38,11 @@ kind: Service
 metadata:
   name: github-deploy
 spec:
-  selector:
-    app: github-deploy
   ports:
   - port: 8080
     protocol: TCP
+  selector:
+    app: github-deploy
   type: LoadBalancer
 ---
 apiVersion: v1
